@@ -37,14 +37,37 @@ app.post("/updateTask/:id", async (req, res) => {
   const subTaskNewName = req.body.subTaskNewName;
   try {
     const task = await tasks.findById(ID);
-    var subTask = task.subTasks.find((t) => {
-      return t.id === subTaskID;
+    task.subTasks.forEach((t) => {
+      if (t.id === subTaskID) {
+        t.task = subTaskNewName;
+      }
     });
-    task[subTaskID] = subTaskNewName;
     await task.save();
-    //console.log("T1", t1);
+    if (!task) {
+      return res.status(404).send();
+    }
+    res.send(task);
+  } catch (e) {
+    res.send(e);
+  }
+});
 
-    res.send(subTask);
+//Delete Task API
+app.post("/deleteTask/:id", async (req, res) => {
+  const ID = req.params.id;
+  const subTaskID = req.body.subTaskID;
+  try {
+    const task = await tasks.findById(ID);
+    t1 = task.subTasks.filter((t) => {
+      console.log(t);
+      return t.id != subTaskID;
+    });
+    task.subTasks = t1;
+    await task.save();
+    if (!task) {
+      return res.status(404).send();
+    }
+    res.send(task);
   } catch (e) {
     res.send(e);
   }
